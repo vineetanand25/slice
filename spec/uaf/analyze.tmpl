@@ -1,0 +1,70 @@
+{{/* type: analyze */}}
+{{/* schema_file: analyze.schema.json */}}
+<persona>
+You are a security expert performing deep vulnerability analysis.
+</persona>
+
+<task>
+I got this report for potential use after free, where {{.ObjectName}} is freed in {{.FreeFunctionName}}() in L{{.FreeLine}} of {{.FreeFunctionFile}} and then later potentially used in {{.UseFunctionName}}() on L{{.UseLine}} of {{.UseFunctionFile}}.
+
+There are {{len .CallChains}} call chain(s) that could connect the free to the use.
+
+Please provide a comprehensive security analysis following these steps:
+1. Determine if this is a VALID use-after-free vulnerability
+2. Analyze the execution path from free to use
+3. Identify preconditions and attacker control points
+4. Assess exploitability and impact
+5. Suggest concrete fixes
+
+Consider both the "normal happy path" and unexpected conditions that could lead to exploitation.
+
+Focus on:
+- Whether the freed object is still FREE at the USE point (not reinitialized/reallocated)
+- Exact conditions required for exploitation  
+- Concrete, actionable fix suggestions with code examples
+- MUST follow the exact nested JSON structure shown below
+</task>
+
+<uaf_report>
+<overview>
+## Vulnerability Overview
+
+**Object**: `{{.ObjectName}}`
+
+**Free Operation**:
+- Function: `{{.FreeFunctionName}}` ({{.FreeFunctionFile}}:{{.FreeLine}})
+- Code: `{{.FreeSnippet}}`
+
+**Use Operation**:
+- Function: `{{.UseFunctionName}}` ({{.UseFunctionFile}}:{{.UseLine}})
+- Code: `{{.UseSnippet}}`
+
+**Execution Path(s)**:
+{{range $i, $chain := .CallChains}}{{add $i 1}}. {{range $j, $func := $chain}}{{if $j}} → {{end}}`{{$func}}`{{end}}
+{{end}}
+</overview>
+
+<functions>
+<free_func_def_ln>
+{{.FreeFunctionDef}}
+</free_func_def_ln>
+
+{{range $i, $def := .IntermediateFuncDefs}}
+<intermediate_func_def_ln_{{$i}}>
+{{$def}}
+</intermediate_func_def_ln_{{$i}}>
+
+{{end}}
+<use_func_def_ln>
+{{.UseFunctionDef}}
+</use_func_def_ln>
+</functions>
+</uaf_report>
+
+<output_format>
+Please respond with a JSON object containing these exact fields with the exact nested structure:
+
+{{.SchemaJSON}}
+
+NOTE: Set "valid" to true only if this is a genuine vulnerability.
+</output_format>

@@ -1,0 +1,64 @@
+{{/* type: triage */}}
+{{/* schema_file: triage.schema.json */}}
+<persona>
+You are a security expert specializing in quick triage of potential vulnerabilities.
+</persona>
+
+<task>
+I need a quick triage of this potential use-after-free finding. This is NOT a deep security analysis - just a basic code flow check.
+
+The finding shows {{.ObjectName}} is freed in {{.FreeFunctionName}}() at L{{.FreeLine}} of {{.FreeFunctionFile}} and then potentially used in {{.UseFunctionName}}() at L{{.UseLine}} of {{.UseFunctionFile}}.
+
+There are {{len .CallChains}} call chain(s) that could connect the free to the use.
+
+**TRIAGE QUESTION**: Does the code flow allow for this to be a potential use-after-free?
+
+I only need you to check:
+1. Does the FREE happen before the USE in the execution flow?
+2. Does it appear to be the SAME VARIABLE being freed and then used?
+3. Basic code flow - ignore nulling, ignore reallocation, ignore complex conditions
+</task>
+
+<uaf_finding>
+<overview>
+**Freed Variable**: `{{.ObjectName}}`
+
+**Free Location**: 
+- Function: `{{.FreeFunctionName}}`
+- File: {{.FreeFunctionFile}}:{{.FreeLine}}
+- Code: `{{.FreeSnippet}}`
+
+**Use Location**:
+- Function: `{{.UseFunctionName}}`
+- File: {{.UseFunctionFile}}:{{.UseLine}}
+- Code: `{{.UseSnippet}}`
+
+**Call Chain(s)**:
+{{range $i, $chain := .CallChains}}{{add $i 1}}. {{range $j, $func := $chain}}{{if $j}} → {{end}}`{{$func}}`{{end}}
+{{end}}
+</overview>
+
+<functions>
+<free_function_code>
+{{.FreeFunctionDef}}
+</free_function_code>
+
+{{range $i, $def := .IntermediateFuncDefs}}
+<intermediate_function_code_{{$i}}>
+{{$def}}
+</intermediate_function_code_{{$i}}>
+
+{{end}}
+<use_function_code>
+{{.UseFunctionDef}}
+</use_function_code>
+</functions>
+</uaf_finding>
+
+<output_format>
+Respond with ONLY this JSON structure:
+
+{{.SchemaJSON}}
+
+Remember: This is just initial triage for code flow, not a security analysis. We're filtering for cases where it's even POSSIBLE there could be a UAF based on basic execution flow.
+</output_format>

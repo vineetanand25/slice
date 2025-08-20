@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "valid": {
+      "type": "boolean",
+      "description": "Whether this finding shows a valid use-after-free pattern"
+    },
+    "reasoning": {
+      "type": "string",
+      "description": "Brief explanation of why the code flow does or doesn't show use-after-free"
+    }
+  },
+  "required": ["valid", "reasoning"],
+  "additionalProperties": false
+}

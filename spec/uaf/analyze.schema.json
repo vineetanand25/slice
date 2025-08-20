@@ -1,0 +1,162 @@
+{
+  "type": "object",
+  "properties": {
+    "valid": {
+      "type": "boolean",
+      "description": "Whether this finding is valid/vulnerable"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Brief description of the vulnerability"
+    },
+    "vuln": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of vulnerability (e.g., use-after-free)"
+        },
+        "affected_object": {
+          "type": "string",
+          "description": "The object/variable that is vulnerable"
+        },
+        "free_loc": {
+          "type": "object",
+          "properties": {
+            "func": {"type": "string"},
+            "file": {"type": "string"},
+            "line": {"type": "number"},
+            "snippet": {"type": "string"}
+          },
+          "required": ["func", "file", "line", "snippet"],
+          "additionalProperties": false
+        },
+        "use_loc": {
+          "type": "object",
+          "properties": {
+            "func": {"type": "string"},
+            "file": {"type": "string"},
+            "line": {"type": "number"},
+            "snippet": {"type": "string"}
+          },
+          "required": ["func", "file", "line", "snippet"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["type", "affected_object", "free_loc", "use_loc"],
+      "additionalProperties": false
+    },
+    "analysis": {
+      "type": "object",
+      "properties": {
+        "entry_point": {
+          "type": "object",
+          "properties": {
+            "function": {"type": "string"},
+            "description": {"type": "string"}
+          },
+          "required": ["function", "description"],
+          "additionalProperties": false
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "execution_path": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step": {"type": "number"},
+              "function": {"type": "string"},
+              "action": {"type": "string"},
+              "critical": {"type": "boolean"},
+              "note": {"type": "string"}
+            },
+            "required": ["step", "function", "action", "critical", "note"],
+            "additionalProperties": false
+          }
+        },
+        "root_cause": {
+          "type": "string"
+        },
+        "attacker_control": {
+          "type": "object",
+          "properties": {
+            "description": {"type": "string"},
+            "methods": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          },
+          "required": ["description", "methods"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["entry_point", "preconditions", "execution_path", "root_cause", "attacker_control"],
+      "additionalProperties": false
+    },
+    "exploitability": {
+      "type": "object",
+      "properties": {
+        "attack_complexity": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "prerequisites": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "impact": {
+          "type": "object",
+          "properties": {
+            "confidentiality": {
+              "type": "string",
+              "enum": ["none", "low", "high"]
+            },
+            "integrity": {
+              "type": "string",
+              "enum": ["none", "low", "high"]
+            },
+            "availability": {
+              "type": "string",
+              "enum": ["none", "low", "high"]
+            },
+            "description": {"type": "string"}
+          },
+          "required": ["confidentiality", "integrity", "availability", "description"],
+          "additionalProperties": false
+        },
+        "poc_outline": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["attack_complexity", "prerequisites", "impact", "poc_outline"],
+      "additionalProperties": false
+    },
+    "fix": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "priority": {
+            "type": "string",
+            "enum": ["primary", "alternative", "additional"]
+          },
+          "description": {"type": "string"},
+          "code": {"type": "string"},
+          "rationale": {"type": "string"}
+        },
+        "required": ["priority", "description", "code", "rationale"],
+        "additionalProperties": false
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": ["valid", "summary", "vuln", "analysis", "exploitability", "fix", "notes"],
+  "additionalProperties": false
+}
