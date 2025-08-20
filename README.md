@@ -1,5 +1,7 @@
 # Slice: SAST + LLM Interprocedural Context Extractor
 
+See https://noperator.dev/posts/slice
+
 ### Built with
 
 - CodeQL
@@ -44,6 +46,7 @@ Available Commands:
   filter      Filter CodeQL vulnerability results using LLM processing
   rank        Rank validated vulnerability findings by criticality
 
+
 $ slice parse -h
 Parse source code in the specified directory and extract detailed function information
 including signatures, parameters, variables, function calls, and definitions.
@@ -52,7 +55,7 @@ Usage:
   slice parse <directory>
 
 
-$ slice parse -h
+$ slice query -h
 Run CodeQL queries against a database and enrich the vulnerability findings
 with full source code context using TreeSitter parsing.
 
